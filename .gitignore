@@ -25,6 +25,7 @@ build/
 .DS_Store
 
 logs/
+*.log
 node_modules
 dist
 dist-ssr
