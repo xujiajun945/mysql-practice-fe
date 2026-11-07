@@ -1,40 +1,54 @@
 <template>
   <el-container class="layout">
-    <el-aside width="220px" class="aside">
+    <el-drawer v-if="isMobile" v-model="drawerVisible" class="mobile-drawer" direction="ltr" size="240px" :with-header="false">
       <div class="brand">MySQL 练习平台</div>
-      <el-menu :default-active="activePath" router class="menu">
-        <el-menu-item index="/tables">
-          <el-icon><Grid /></el-icon>
-          <span>数据库浏览</span>
+      <el-menu :default-active="activePath" router class="menu" @select="drawerVisible = false">
+        <el-menu-item v-for="m in mainMenus" :key="m.path" :index="m.path">
+          <el-icon><component :is="m.icon" /></el-icon>
+          <span>{{ m.label }}</span>
         </el-menu-item>
-        <el-menu-item index="/sql">
-          <el-icon><EditPen /></el-icon>
-          <span>自定义 SQL</span>
-        </el-menu-item>
-        <el-menu-item index="/quiz">
-          <el-icon><Notebook /></el-icon>
-          <span>做题练习</span>
-        </el-menu-item>
-        <el-sub-menu v-if="isAdmin" index="admin">
+        <el-sub-menu v-if="adminMenus.length" index="admin">
           <template #title>
             <el-icon><Setting /></el-icon>
             <span>管理后台</span>
           </template>
-          <el-menu-item v-if="auth.hasCap('USER_ADMIN')" index="/admin/users">用户与审批</el-menu-item>
-          <el-menu-item v-if="auth.hasCap('USER_ADMIN')" index="/admin/roles">角色与权限</el-menu-item>
-          <el-menu-item v-if="auth.hasCap('QUESTION_ADMIN')" index="/admin/questions">题库管理</el-menu-item>
-          <el-menu-item v-if="auth.hasCap('REVIEW')" index="/admin/reviews">答题批阅</el-menu-item>
-          <el-menu-item v-if="auth.hasCap('AUDIT_VIEW')" index="/admin/audit">审计日志</el-menu-item>
-          <el-menu-item v-if="auth.hasCap('USER_ADMIN')" index="/admin/sandbox">沙盒重置</el-menu-item>
+          <el-menu-item v-for="m in adminMenus" :key="m.path" :index="m.path">{{ m.label }}</el-menu-item>
+        </el-sub-menu>
+      </el-menu>
+      <div class="drawer-footer">
+        <el-button text @click="openPasswordFromDrawer">修改密码</el-button>
+      </div>
+    </el-drawer>
+
+    <el-aside v-if="!isMobile" width="220px" class="aside">
+      <div class="brand">MySQL 练习平台</div>
+      <el-menu :default-active="activePath" router class="menu">
+        <el-menu-item v-for="m in mainMenus" :key="m.path" :index="m.path">
+          <el-icon><component :is="m.icon" /></el-icon>
+          <span>{{ m.label }}</span>
+        </el-menu-item>
+        <el-sub-menu v-if="adminMenus.length" index="admin">
+          <template #title>
+            <el-icon><Setting /></el-icon>
+            <span>管理后台</span>
+          </template>
+          <el-menu-item v-for="m in adminMenus" :key="m.path" :index="m.path">{{ m.label }}</el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
+
     <el-container>
       <el-header class="header">
-        <div class="muted">{{ roleText }}</div>
+        <div class="header-left">
+          <el-button v-if="isMobile" text class="burger" @click="drawerVisible = true">
+            <el-icon><Menu /></el-icon>
+          </el-button>
+          <span v-if="isMobile" class="brand-mobile">MySQL 练习平台</span>
+          <span v-else class="muted">{{ roleText }}</span>
+        </div>
         <div class="right">
-          <span class="user-name">{{ auth.user?.nickname || auth.user?.username }}</span>
-          <el-button text @click="passwordVisible = true">修改密码</el-button>
+          <span v-if="!isMobile" class="user-name">{{ auth.user?.nickname || auth.user?.username }}</span>
+          <el-button v-if="!isMobile" text @click="passwordVisible = true">修改密码</el-button>
           <el-button text type="danger" @click="logout">退出登录</el-button>
         </div>
       </el-header>
@@ -57,10 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Grid, EditPen, Notebook, Setting } from '@element-plus/icons-vue'
+import { Grid, EditPen, Notebook, Setting, Menu } from '@element-plus/icons-vue'
 import { useAuthStore } from '../stores/auth'
 import { authApi } from '../api'
 
@@ -70,12 +84,41 @@ const router = useRouter()
 
 const activePath = computed(() => route.path)
 const roleText = computed(() => (auth.user ? `${auth.user.roleName}（${auth.user.roleCode}）` : ''))
-const isAdmin = computed(() => auth.caps.some((c) => ['USER_ADMIN', 'QUESTION_ADMIN', 'REVIEW', 'AUDIT_VIEW'].includes(c)))
 
+const mainMenus = [
+  { path: '/tables', label: '数据库浏览', icon: Grid },
+  { path: '/sql', label: '自定义 SQL', icon: EditPen },
+  { path: '/quiz', label: '做题练习', icon: Notebook }
+]
+
+const adminMenus = computed(() => {
+  const list: { path: string; label: string }[] = []
+  if (auth.hasCap('USER_ADMIN')) {
+    list.push({ path: '/admin/users', label: '用户与审批' })
+    list.push({ path: '/admin/roles', label: '角色与权限' })
+  }
+  if (auth.hasCap('QUESTION_ADMIN')) list.push({ path: '/admin/questions', label: '题库管理' })
+  if (auth.hasCap('REVIEW')) list.push({ path: '/admin/reviews', label: '答题批阅' })
+  if (auth.hasCap('AUDIT_VIEW')) list.push({ path: '/admin/audit', label: '审计日志' })
+  if (auth.hasCap('USER_ADMIN')) list.push({ path: '/admin/sandbox', label: '沙盒重置' })
+  return list
+})
+
+const isMobile = ref(window.innerWidth <= 768)
+const drawerVisible = ref(false)
 const passwordVisible = ref(false)
 const oldPassword = ref('')
 const newPassword = ref('')
 const saving = ref(false)
+
+function syncViewport() {
+  isMobile.value = window.innerWidth <= 768
+}
+
+function openPasswordFromDrawer() {
+  drawerVisible.value = false
+  passwordVisible.value = true
+}
 
 async function changePassword() {
   if (!oldPassword.value || !newPassword.value) {
@@ -98,6 +141,9 @@ async function logout() {
   await auth.signOut()
   router.push('/login')
 }
+
+onMounted(() => window.addEventListener('resize', syncViewport))
+onBeforeUnmount(() => window.removeEventListener('resize', syncViewport))
 </script>
 
 <style scoped>
@@ -132,13 +178,41 @@ async function logout() {
   justify-content: space-between;
   border-bottom: 1px solid #ebeef5;
 }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
 .right {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: none;
 }
 .user-name {
   font-weight: 600;
   margin-right: 8px;
+}
+.burger {
+  padding: 0 4px;
+}
+.brand-mobile {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.drawer-footer {
+  padding: 12px 16px;
+}
+@media (max-width: 768px) {
+  .header {
+    padding: 0 10px;
+    height: 52px;
+  }
+  .brand-mobile {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 </style>

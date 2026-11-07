@@ -111,10 +111,18 @@ async function queryStatus() {
 }
 .login-card {
   width: 420px;
+  max-width: 92vw;
+  box-sizing: border-box;
   background: #fff;
   border-radius: 12px;
   padding: 28px 32px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+@media (max-width: 768px) {
+  .login-card {
+    padding: 20px;
+    border-radius: 10px;
+  }
 }
 .login-card h2 {
   margin: 0 0 6px;

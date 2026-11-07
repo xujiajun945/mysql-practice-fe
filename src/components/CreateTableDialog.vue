@@ -2,19 +2,19 @@
   <el-dialog :model-value="modelValue" title="新建表" width="880px" @update:model-value="close" @closed="reset">
     <el-form label-width="90px">
       <el-row :gutter="12">
-        <el-col :span="8">
+        <el-col :xs="24" :sm="8">
           <el-form-item label="Schema">
             <el-select v-model="form.schema" placeholder="选择沙盒库" style="width: 100%">
               <el-option v-for="s in ddlSchemas" :key="s" :label="s" :value="s" />
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col :xs="24" :sm="8">
           <el-form-item label="表名">
             <el-input v-model="form.table" placeholder="如 student" />
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col :xs="24" :sm="8">
           <el-form-item label="表备注">
             <el-input v-model="form.comment" placeholder="可选" />
           </el-form-item>
@@ -24,14 +24,14 @@
       <el-divider content-position="left">字段定义</el-divider>
       <div v-for="(col, index) in form.columns" :key="index" class="column-row">
         <el-row :gutter="8">
-          <el-col :span="4"><el-input v-model="col.name" placeholder="字段名" size="small" /></el-col>
-          <el-col :span="4">
+          <el-col :xs="12" :sm="4"><el-input v-model="col.name" placeholder="字段名" size="small" /></el-col>
+          <el-col :xs="12" :sm="4">
             <el-select v-model="col.type" size="small" style="width: 100%">
               <el-option v-for="t in types" :key="t" :label="t" :value="t" />
             </el-select>
           </el-col>
-          <el-col :span="3"><el-input-number v-model="col.length" :min="1" :max="65535" size="small" controls-position="right" placeholder="长度" style="width: 100%" /></el-col>
-          <el-col :span="3">
+          <el-col :xs="8" :sm="3"><el-input-number v-model="col.length" :min="1" :max="65535" size="small" controls-position="right" placeholder="长度" style="width: 100%" /></el-col>
+          <el-col :xs="16" :sm="3">
             <el-select v-model="col.defaultType" size="small" style="width: 100%">
               <el-option label="无默认" value="NONE" />
               <el-option label="NULL" value="NULL" />
@@ -39,10 +39,10 @@
               <el-option label="CURRENT_TIMESTAMP" value="CURRENT_TIMESTAMP" />
             </el-select>
           </el-col>
-          <el-col :span="3">
+          <el-col :xs="12" :sm="3">
             <el-input v-model="col.defaultValue" size="small" placeholder="默认值" :disabled="col.defaultType !== 'LITERAL'" />
           </el-col>
-          <el-col :span="7">
+          <el-col :xs="12" :sm="7">
             <el-checkbox v-model="col.nullable" size="small">可空</el-checkbox>
             <el-checkbox v-model="col.primaryKey" size="small">主键</el-checkbox>
             <el-checkbox v-model="col.unique" size="small">唯一</el-checkbox>
@@ -50,10 +50,10 @@
           </el-col>
         </el-row>
         <el-row :gutter="8" class="column-row-second">
-          <el-col :span="20">
+          <el-col :xs="18" :sm="20">
             <el-input v-model="col.comment" size="small" placeholder="字段备注（可选）" />
           </el-col>
-          <el-col :span="4">
+          <el-col :xs="6" :sm="4">
             <el-button size="small" text type="danger" :disabled="form.columns.length <= 1" @click="removeColumn(index)">删除字段</el-button>
           </el-col>
         </el-row>

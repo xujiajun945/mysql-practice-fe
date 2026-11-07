@@ -91,18 +91,18 @@
     <el-dialog v-model="addColumnVisible" title="新增字段" width="720px">
       <el-form label-width="100px">
         <el-row :gutter="12">
-          <el-col :span="8"><el-form-item label="字段名"><el-input v-model="columnForm.name" /></el-form-item></el-col>
-          <el-col :span="8">
+          <el-col :xs="24" :sm="8"><el-form-item label="字段名"><el-input v-model="columnForm.name" /></el-form-item></el-col>
+          <el-col :xs="24" :sm="8">
             <el-form-item label="类型">
               <el-select v-model="columnForm.type" style="width: 100%">
                 <el-option v-for="t in types" :key="t" :label="t" :value="t" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8"><el-form-item label="长度"><el-input-number v-model="columnForm.length" :min="1" controls-position="right" style="width: 100%" /></el-form-item></el-col>
+          <el-col :xs="24" :sm="8"><el-form-item label="长度"><el-input-number v-model="columnForm.length" :min="1" controls-position="right" style="width: 100%" /></el-form-item></el-col>
         </el-row>
         <el-row :gutter="12">
-          <el-col :span="8">
+          <el-col :xs="24" :sm="8">
             <el-form-item label="默认值类型">
               <el-select v-model="columnForm.defaultType" style="width: 100%">
                 <el-option label="无默认" value="NONE" />
@@ -112,8 +112,8 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8"><el-form-item label="默认值"><el-input v-model="columnForm.defaultValue" :disabled="columnForm.defaultType !== 'LITERAL'" /></el-form-item></el-col>
-          <el-col :span="8">
+          <el-col :xs="24" :sm="8"><el-form-item label="默认值"><el-input v-model="columnForm.defaultValue" :disabled="columnForm.defaultType !== 'LITERAL'" /></el-form-item></el-col>
+          <el-col :xs="24" :sm="8">
             <el-form-item label="位置">
               <el-select v-model="columnForm.position" style="width: 100%">
                 <el-option label="末尾" value="END" />
@@ -124,14 +124,14 @@
           </el-col>
         </el-row>
         <el-row :gutter="12">
-          <el-col :span="8">
+          <el-col :xs="24" :sm="8">
             <el-form-item v-if="columnForm.position === 'AFTER'" label="在谁之后">
               <el-select v-model="columnForm.afterColumn" style="width: 100%">
                 <el-option v-for="c in detail?.columns || []" :key="c.name" :label="c.name" :value="c.name" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="16">
+          <el-col :xs="24" :sm="16">
             <el-form-item label="约束">
               <el-checkbox v-model="columnForm.nullable">可空</el-checkbox>
               <el-checkbox v-model="columnForm.primaryKey">主键</el-checkbox>
@@ -339,5 +339,11 @@ onMounted(load)
 .title {
   margin: 0;
   font-size: 20px;
+}
+@media (max-width: 768px) {
+  .title {
+    font-size: 15px;
+    word-break: break-all;
+  }
 }
 </style>

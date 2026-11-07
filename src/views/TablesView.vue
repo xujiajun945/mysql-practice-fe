@@ -14,7 +14,7 @@
       <div class="toolbar">
         <div class="page-title" style="margin: 0">{{ activeSchema || '请选择 schema' }}</div>
         <div style="flex: 1"></div>
-        <el-input v-model="keyword" placeholder="搜索表名" clearable style="width: 200px" />
+        <el-input v-model="keyword" class="table-search" placeholder="搜索表名" clearable />
         <el-button @click="loadTables">刷新</el-button>
         <el-button v-if="canCreate" type="primary" @click="createVisible = true">新建表</el-button>
       </div>
@@ -116,5 +116,25 @@ onMounted(loadSchemas)
 }
 .charset {
   margin-left: 8px;
+}
+.table-search {
+  width: 200px;
+}
+@media (max-width: 768px) {
+  .tables-page {
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+  }
+  .schema-panel {
+    width: 100%;
+    max-height: none;
+  }
+  .table-panel {
+    width: 100%;
+  }
+  .table-search {
+    width: 100%;
+  }
 }
 </style>

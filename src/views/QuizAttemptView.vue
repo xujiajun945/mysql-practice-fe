@@ -510,4 +510,20 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 }
-</style>
+@media (max-width: 768px) {
+  .ref-grid {
+    grid-template-columns: 1fr;
+  }
+  .ref-head {
+    flex-wrap: wrap;
+  }
+  .ref-head :deep(.el-select) {
+    width: 100% !important;
+  }
+  .ref-body {
+    max-height: 320px;
+  }
+  .ref-table-wrap {
+    max-height: 180px;
+  }
+}</style>
